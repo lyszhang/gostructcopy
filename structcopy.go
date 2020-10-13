@@ -3,12 +3,14 @@
 package gostructcopy
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"reflect"
 )
 
-//StructCopy copy the exported value of a struct to a likely struct , with reflect.
-func StructCopy(src, dst interface{}) error {
+//StructCopyReflect copy the exported value of a struct to a likely struct , with reflect.
+func StructCopyReflect(src, dst interface{}) error {
 	srcV, err := srcFilter(src)
 	if err != nil {
 		return err
@@ -29,6 +31,22 @@ func StructCopy(src, dst interface{}) error {
 				dstV.Elem().Field(i).Set(v)
 			}
 		}
+	}
+
+	return nil
+}
+
+//StructCopyGob copy the exported value of a struct to a likely struct , with reflect.
+func StructCopyGob(src, dst interface{}) error {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if err := enc.Encode(src); err != nil{
+		return err
+	}
+
+	dec := gob.NewDecoder(&buf)
+	if err := dec.Decode(dst); err != nil {
+		return err
 	}
 
 	return nil

@@ -18,7 +18,10 @@ func BenchmarkStructCopy(bench *testing.B) {
 		b    int
 	}{}
 	for i := 0; i < bench.N; i++ {
-		StructCopy(&a, &b)
+		StructCopyReflect(&a, &b)
+	}
+	for i := 0; i < bench.N; i++ {
+		StructCopyGob(&a, &b)
 	}
 }
 
@@ -35,7 +38,7 @@ func TestStructCopy(t *testing.T) {
 		Desc string
 		b    int
 	}{}
-	err := StructCopy(&a, &b)
+	err := StructCopyReflect(&a, &b)
 	if err != nil {
 		t.Fatal(err)
 	} else if a.Id == b.Id && a.Name == b.Name {
